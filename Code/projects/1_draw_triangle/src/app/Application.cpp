@@ -1,4 +1,4 @@
-#include "Aplication.h"
+#include "Application.h"
 #include "GLWindow.h"
 #include "Renderer.h"
 
