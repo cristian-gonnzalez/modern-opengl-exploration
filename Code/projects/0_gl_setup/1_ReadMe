@@ -1,0 +1,68 @@
+Modern OpenGL
+
+  We are going to use 
+
+    - SDL to create a OpenGL Windows
+    - GLAD that is a library that brings all the OpenGL functions to comunicate with the GPU.
+
+Why do we us SDL2?
+
+    SDL2:
+        - Use this to render a windows to display an OpenGLContext
+                                                ^~~~~~~~~~~~~ 
+                        It is the large object that holds onto OpenGL.
+
+                    The important thing it represent the frame buffers that rendering commands 
+
+    - Handling I/O
+    - Setupt subsytem: Sound/Networking/Images
+    - Threading support
+
+
+Setup:
+
+1. SDL installation:
+
+    $ sudo apt install libsdl2-dev       
+
+2. GLAD:
+
+  Go to GLAD: https://glad.dav1d.de/
+  
+  This is a tool library that allows us to query the OpenGL information in our setup
+
+        Select options:
+
+        Language: C/C++                               Specification: OpenGL
+        API:                                          Profile: Core             
+            * gl: Version 4.1
+        Extensions
+            ADD ALL
+        
+        Options:
+            x Generate a loader
+
+  Glad is a library which only declares functions in a header with no implementation. The actual implementation is in our
+drver or OS.
+
+
+
+$ tree
+glad
+├── include
+│   ├── KHR
+│   │   └── khrplatform.h
+│   └── glad
+│       └── glad.h
+└── src
+    └── glad.c
+
+
+- Compilation:
+                           Needed to call glGetString()
+                          ^~~~~~~~~~~~~~~~~ ^~~~~~~~~~~~~~~~
+$ g++ -std=c++17 main.cpp ./glad/src/glad.c -I./glad/include -o prog -lSDL2 -ldl
+                                                                             ^~~
+                                                                            dlopen
+                                                          reponsable to loading symbolds at runtime        
+
