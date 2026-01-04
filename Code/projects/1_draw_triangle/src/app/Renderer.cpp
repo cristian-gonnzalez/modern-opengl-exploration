@@ -33,17 +33,33 @@ Renderer::~Renderer()
 // 
 // Pipeline stage:
 // - Vertex Specification (before vertex shader)
-void Renderer::setup_geometry()
+void Renderer::setup_geometry(GeometryLayout layout)
 {
     // Lives on the CPU
-    //    Across different architectures they will be more
+    //    GLfloat is defined across different architectures, they will be more
     //  uniform 
     //                ^~~~~~~
     const std::vector<GLfloat> vertices{ // x      y      z
                                            -0.8f, -0.8f, 0.0f,  // Vertex 1 (Left)
-                                            0.8f, -0.8f, 0.0f,  // Vertex 2 (Rigth)
+                                            0.8f, -0.8f, 0.0f,  // Vertex 2 (Right)
                                             0.0f,  0.8f, 0.0f   // Vertex 3 (Top)
                                         };
+
+    const std::vector<GLfloat> colors{ //    r      g      b
+                                            1.0f,  0.0f, 0.0f,  // Vertex 1 (Left)  red
+                                            0.0f,  1.0f, 0.0f,  // Vertex 2 (Right) green 
+                                            0.0f,  0.0f, 1.0f   // Vertex 3 (Top)   blue
+                                        };
+    
+    const std::vector<GLfloat> vertices_n_colors{ // x      y      z
+                                           -0.8f, -0.8f, 0.0f,  // Vertex 1 (Left)
+                                            1.0f,  0.0f, 0.0f,  //           color ->  red
+                                            0.8f, -0.8f, 0.0f,  // Vertex 2 (Right)
+                                            0.0f,  1.0f, 0.0f,  //           color -> green 
+                                            0.0f,  0.8f, 0.0f,  // Vertex 3 (Top)
+                                            0.0f,  0.0f, 1.0f   //           color ->   blue
+                                        };
+
 
     // How do we get these vertex positions on our GPU? 
     // We need to setup the VAO (Vertex Array object) and the VBO (Vertex Buffer Object)
@@ -53,11 +69,11 @@ void Renderer::setup_geometry()
     // - Stores *how* vertex attributes are read
     // - Does NOT store vertex data itself
     
-    // Generate vertex array object names
+    // Generate a vertex array object
     // Note:
     //   We can think of the VAO as a 'wrapper around' all of the Vertex Buffer Objects, in a sense
     // that it encapsulates all VBO state that we are setting up. 
-    //   Thus, it is also important that we glBindVertexArray (i.e. sekect the VAO to use)
+    //   Thus, it is also important that we glBindVertexArray (i.e. select the VAO to use)
     glGenVertexArrays(1,        // Specifies the number of vertex array object to generate.
                       &_vao);   // OpenGL use an integer that's sort of a handler of the object
     //                 ^~~~ 
@@ -69,69 +85,41 @@ void Renderer::setup_geometry()
     // Note: 
     //   OpenGL is a C Specification, this means that OpenGL objects are not C++ objects.
     // They are driver-managed resources referenced by integer handles (GLuint) such as 
-    // file descriptors in sockets or files.
+    // file descriptors in sockets or files. In this case, '_vao' is the handle of the VAO.
     //
     // void glGenVertexArrays(	GLsizei n, GLuint* arrays);
     //                           
     //      n       -  Number of VAO IDs (handles) to generate
     //      arrays  -  Pointer to memory where the IDs will be written
 
+
+
     // Vertex Buffer Object (VBO) creation:
     // 
     // - Stores actual vertex data in GPU memory
 
-    // Creates a new vertext buffer object
-    // Note:
-    //   We will see this pattern of code often in OpenGL of creating and binding to a buffer
-    glGenBuffers(1, 
-                 &_vbo );
-    
-    // Bind is equivalent to 'selecting the actuve buffer object' that we want to work with in OpenGL
-    glBindBuffer( GL_ARRAY_BUFFER,  // GLenum target,  // Defines the information the buffer will store
-    //            ^~~~~~~~~~~~~~~
-    //      To access Vertex attributes
-                  _vbo);            // VBO id 
+    switch (layout) {
+        case GeometryLayout::SingleVBO:
+        {
+             _setup_single_vbo(vertices);
+            break;
+        }   
+        case GeometryLayout::InterleavedVBO:
+        {
+             _setup_interleaved_vbo(vertices_n_colors);
+            break;
+        }   
+        case GeometryLayout::MultipleVBOs:
+        {
+            _setup_multiple_vbos(vertices, colors);
+            break;
+        }   
+    }
 
-
-    // Upload data to GPU:
-    //    Now, in our currently binded buffer, we populate the data from our 'vertices' (which is on the CPU)
-    // onto a buffer that will be on the GPU
-    
-    // Store vertices into a VBO
-    glBufferData(GL_ARRAY_BUFFER,                       // GLenum target : kind of buffer
-                 vertices.size() * sizeof(GLfloat),     // size: Specifies the size in bytes of the buffer object's new data store
-                 vertices.data(),
-                 GL_STATIC_DRAW );                      // GLenum usage:  Specifies the expected usage pattern of the data store. 
-      //         ^~~~~~~~~~~~~~~                           The symbolic constant must be 
-      //      data will not change often             GL_STREAM_DRAW, GL_STREAM_READ, GL_STREAM_COPY, 
-                                                        //        GL_STATIC_DRAW, GL_STATIC_READ, GL_STATIC_COPY, 
-                                                        //        GL_DYNAMIC_DRAW, GL_DYNAMIC_READ, GL_DYNAMIC_COPY.
-
-
-    // Vertex Attribute Layout:
-    // 
-    //   Attribute location 0:
-    //     - 3 floats per vertex (x, y, z)
-    //     - tightly packed
-    //
-    // Enable attribute location 0
-    glEnableVertexAttribArray(0); 
-    // For the specific attribute in our vertex specification, we use 'glVertexAttributePointer' to figure out
-    // how we are going to move through the data
-    glVertexAttribPointer(0,	         // attribute location
-                                         // In the future, you will see in our vertex shader this also correspond
-                                         // to (layout=0) which selects these atrrubutes
-                          3,             // number of components,  (x, y , z)
-                          GL_FLOAT,      // GLenum type
-                          GL_FALSE,      // normalized?
-                          0,             // stride
-                          (void*) 0);    // offset
-
-    
     // IMPORTANT:
     // - Attribute enable state is stored in the VAO
     // - Do NOT disable it here
-    // Unbind our currenttly bound VAO
+    // Unbind our currently bound VAO
     glBindVertexArray(0);
 
     // Note: default object ID 0
@@ -162,10 +150,209 @@ void Renderer::setup_geometry()
     // 
     // So unbinding is good practice, especially for learning.
 
-    // Disable any attributes we opnened in our Vertex Attribute Array
+    // Disable any attributes we opened in our Vertex Attribute Array
     // as we do not want to leave them opened
     // glDisableVertexAttribArray(0);   // Im not sure about this line
 }
+
+
+
+void Renderer::_setup_single_vbo(const std::vector<GLfloat>& vertices)
+{
+    // Creates a new vertext buffer object (VBO) in the GPU
+    // Note:
+    //   We will see this pattern of code often in OpenGL of creating and binding to a buffer
+    glGenBuffers(1, 
+                 &_vbo );
+    
+    // Bind is equivalent to 'selecting the actuve buffer object' that we want to work with in OpenGL
+    glBindBuffer( GL_ARRAY_BUFFER,  // GLenum target,  // Defines the information the buffer will store
+    //            ^~~~~~~~~~~~~~~
+    //      To access Vertex attributes
+                  _vbo);            // VBO id 
+
+
+    // Upload data to GPU:
+    //    Now, in our currently binded buffer, we populate the data from our 'vertices' (which is on the CPU)
+    // onto a buffer that will be on the GPU
+    
+    // Store vertices into a VBO
+    glBufferData(GL_ARRAY_BUFFER,                       // GLenum target : kind of buffer
+                 vertices.size() * sizeof(GLfloat),     // size: Specifies the size in bytes of the buffer object's new data store
+                 vertices.data(),
+                 GL_STATIC_DRAW );                      // GLenum usage:  Specifies the expected usage pattern of the data store. 
+      //         ^~~~~~~~~~~~~~~                           The symbolic constant must be 
+      //      data will not change often             GL_STREAM_DRAW, GL_STREAM_READ, GL_STREAM_COPY, 
+                                                        //        GL_STATIC_DRAW, GL_STATIC_READ, GL_STATIC_COPY, 
+                                                        //        GL_DYNAMIC_DRAW, GL_DYNAMIC_READ, GL_DYNAMIC_COPY.
+    
+    // Note:
+    //   We cannot define the VAO layout before binding VBO (glBindBuffer), since calling glVertexAttribPointer means 
+    // “Read attribute data from the buffer currently bound to GL_ARRAY_BUFFER.”
+    //
+    //   If no buffer is bound, this becomes either: undefined behavior or an OpenGL error in core profile
+    //
+    //   So before setting attribute pointers (glEnableVertexAttribArray/glVertexAttribPointer), we must call glBindBuffer
+
+    // Defines Vertex Attribute Layout.
+    // 
+    //  In this case, we only have one attribute ('position') since the VBO is [x y z][x y z][x y z][x y z].... This 
+    // will be our attribute location 0 
+    //
+    //   Attribute location 0:
+    //     - 3 floats per vertex (x, y, z)
+    //     - tightly packed
+    //
+    //           VAO (_vao)  
+    //          ┌───────────────────────────────────┐  
+    //          | ┌──────────────────────────────┐  |
+    //          | | name      | type  | location |  |             VBO (_vbo)
+    //          | | position  | vec3  | 0        |--|------------>[ x,y,z, x,y,z,  x,y,z ]
+    //          | └──────────────────────────────┘  |
+    //          └───────────────────────────────────┘
+    //    
+
+    // Enable attribute location 0
+    glEnableVertexAttribArray(0); 
+    // For the specific attribute in our vertex specification, we use 'glVertexAttributePointer' to figure out
+    // how we are going to move through the data
+    glVertexAttribPointer(0,	         // attribute location
+                                         // In the future, you will see in our vertex shader this also correspond
+                                         // to (layout=0) which selects these atrrubutes
+                          3,             // number of components,  (x, y , z)
+                          GL_FLOAT,      // GLenum type
+                          GL_FALSE,      // normalized?
+                          0,             // stride
+                                         // 0 is used when we have only one attribute
+                          (void*) 0);    // offset
+
+    // Note:
+    //  If we had more attributes such as color, this would be attribute with location 1.
+    //
+    //  The VBO would be [x y z][r g b a][x y z][r g b a]...
+    //
+    //  For each attribute to define, we must call glEnableVertexAttribArray and glVertexAttribPointer 
+    //  
+    // glEnableVertexAttribArray(0); 
+    // glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 7 * sizeof(GLfloat) , (void*) 0);
+    //                                                 ^~~~~~~~~~~~~~~~~~~~
+    //                                                       Stride 
+    //                                     Distance (in bytes) between consecutive vertices for the SAME attribute
+    //                                     “To get the next 'position', how many bytes do I jump?”
+    //                                     [x y z r g b a][x y z r g b a][x y z r g b a]
+    //                                      ^ position     ^ position     ^ position
+    //
+    // glEnableVertexAttribArray(1); 
+    // glVertexAttribPointer(1, 4, GL_FLOAT, GL_FALSE, 7 * sizeof(GLfloat) , (void*)(3 * sizeof(GLfloat)));
+    //                          ^                      ^~~~~~~~~~~~~~~~~~~~           ^~~~~~~~~~~~~~~~~~~ ofsset
+    //                       [r g b a]                          Stride 
+    //                                     “To get the next 'color', how many bytes do I jump?”
+    //                                     [x y z r g b a][x y z r g b a][x y z r g b a]
+    //                                            ^ color        ^ color        ^ color
+    
+}
+
+
+void Renderer::_setup_interleaved_vbo(const std::vector<GLfloat>& vertices_data )
+{
+    //           VAO (_vao)   
+    //          ┌───────────────────────────────────┐  
+    //          | ┌──────────────────────────────┐  |            VBO (_vbo)
+    //          | | name      | type  | location |  |            [ x,y,z,r,g,b,  x,y,z,r,g,b,  x,y,z,r,g,b, ]
+    //          | | position  | vec3  | 0        |--|------┐       ^     ^
+    //          | | colors    | vec3  | 1        |--|---┐  └-------┘     |
+    //          | └──────────────────────────────┘  |   └----------------┘
+    //          └───────────────────────────────────┘
+
+    // Creates a VBO in the GPU
+    glGenBuffers( 1, &_vbo );
+    glBindBuffer( GL_ARRAY_BUFFER, _vbo);
+
+    // Upload data to GPU
+    glBufferData(GL_ARRAY_BUFFER,                       
+                 vertices_data.size() * sizeof(GLfloat),
+                 vertices_data.data(),
+                 GL_STATIC_DRAW );                       
+    
+    // we need to enable and point the VAO attribute o the current bound buffer
+    
+    // Positions:
+    //
+    //   The stride or jump is the distance (in bytes) between consecutive vertex data for the SAME attribute. 
+    // To get the next 'vertex data attribute', how many bytes do I jump?
+    //
+    // [ x,y,z,r,g,b,  x,y,z,r,g,b,  x,y,z,r,g,b, ]
+    //   ^             ^
+    //   └─────────────┘
+    //      6 positions
+    //
+    // stride = full vertex-data size
+    GLsizei stride = 6 * sizeof(GLfloat);
+
+    glEnableVertexAttribArray(0);
+    glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, stride, (GLvoid*) 0 );
+    //                       ^                                      ^
+    //                    (x,y,z)                                offset
+    
+    // Colors       
+    //   Offset is 3 element and strides remains the same:
+    //
+    // [ x,y,z,r,g,b,  x,y,z,r,g,b,  x,y,z,r,g,b, ]
+    //         ^             ^
+    //         └─────────────┘
+    //            6 positions
+
+    glEnableVertexAttribArray(1);
+    glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, stride, (GLvoid*)( 3 * sizeof(GLfloat) ) );
+    //                       ^                                       ^ 
+    //                      (r,g,b)                                offset  
+
+
+}
+
+void Renderer::_setup_multiple_vbos(const std::vector<GLfloat>& vertices, const std::vector<GLfloat>& colors)
+{
+    //           VAO (_vao)   
+    //          ┌───────────────────────────────────┐  
+    //          | ┌──────────────────────────────┐  |
+    //          | | name      | type  | location |  |             VBO (_vbos[0])
+    //          | | position  | vec3  | 0        |--|------------>[ x,y,z,  x,y,z,  x,y,z ]
+    //          | | colors    | vec3  | 1        |--|---┐         VBO (_vbos[1])
+    //          | └──────────────────────────────┘  |   └-------->[ r,g,b,  r,g,b,  r,g,b ]
+    //          └───────────────────────────────────┘
+    
+    _vbos.resize(2);
+
+    glGenBuffers(2, _vbos.data() );
+
+    // Upload data to GPU:
+    
+    // positions
+    glBindBuffer( GL_ARRAY_BUFFER, _vbos[0] ); 
+    glBufferData( GL_ARRAY_BUFFER,                       // GLenum target : kind of buffer
+                  vertices.size() * sizeof(GLfloat),     // size: Specifies the size in bytes of the buffer object's new data store
+                  vertices.data(),
+                  GL_STATIC_DRAW );                      // GLenum usage:  Specifies the expected usage pattern of the data store. 
+    
+    // we need to enable and point the VAO attribute o the current bound buffer
+    // Note:
+    //   glVertexAttribPointer records a relationship between an attribute index and the buffer currently bound to GL_ARRAY_BUFFER.
+    // That's why 
+    glEnableVertexAttribArray(0);
+    glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 0, nullptr);
+
+    
+    // colors
+    glBindBuffer( GL_ARRAY_BUFFER, _vbos[1] ); 
+    glBufferData( GL_ARRAY_BUFFER,                       // GLenum target : kind of buffer
+                  colors.size() * sizeof(GLfloat),     // size: Specifies the size in bytes of the buffer object's new data store
+                  colors.data(),
+                  GL_STATIC_DRAW );                  
+
+    glEnableVertexAttribArray(1);
+    glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, 0, nullptr);
+}
+
 
 // Step 2: Shader pipeline creation
 // 
@@ -176,9 +363,9 @@ void Renderer::setup_geometry()
 // Pipeline stages:
 // - Vertex Shader
 // - Fragment Shader
-void Renderer::create_graphics_pipeline()
+void Renderer::create_graphics_pipeline(const std::string& shaders_dir)
 {
-  _shader_program  = create_shader_program();
+  _shader_program  = create_shader_program(shaders_dir);
 }
 
 // Step 3: Frame preparation
@@ -314,16 +501,16 @@ GLuint Renderer::compile_shader(GLenum type, const std::string& source) const
  * 
  * Note: A shader program defines programmable stages of the graphics pipeline and becomes active when bound using glUseProgram.
  */
-GLuint Renderer::create_shader_program() const
+GLuint Renderer::create_shader_program(const std::string& shaders_dir) const
 {
     // Creates a new program object
     GLuint program = glCreateProgram();
 
     // Compile our shaders
     GLuint vs = compile_shader( GL_VERTEX_SHADER,
-                                read_file("./src/shaders/vertex_shader.shader") );
+                                read_file(shaders_dir + "/vertex.glsl") );
     GLuint fs = compile_shader( GL_FRAGMENT_SHADER,
-                                read_file("./src/shaders/fragment_shader.shader") );
+                                read_file(shaders_dir + "/fragment.glsl") );
 
     // Link our two shader programs ogether
     // Consider this the equivalent of taking two .cpp files and linking them into one executable fie

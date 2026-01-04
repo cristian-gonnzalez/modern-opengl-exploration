@@ -8,6 +8,8 @@ INCLUDE= -I. -I$(OPENGL_INCLUDE)
 
 
 all:
+	mkdir -p /tmp/gl/shaders
+	cp -r ./src/shaders/* /tmp/gl/shaders/
 	g++ -std=c++20 $(SRC) $(INCLUDE) -o prog -lSDL2 -ldl
 
 clean:
