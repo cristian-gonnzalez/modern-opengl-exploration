@@ -33,26 +33,20 @@ void Application::run( GeometryLayout layout )
     // Create and SDL window + GL context
     GLWindow window(640, 480);
 
-    // 2. Create renderer AFTER GL context exists
+    // Create renderer AFTER GL context exists
     Renderer renderer;
 
-    // Creates the vertices in the CPU and then transfering 
+    // 2. Creates the vertices in the CPU and then transfering 
     // thise ti the GPU using GL commands 
     renderer.setup_geometry(layout);
 
-    if( layout ==  GeometryLayout::SingleVBO )
-    {
-        // 3. Create our graphics pipline
-        //    - At a minimumm, this means setting up the vertex and fragment shader
-        //   which means laoding the shaders, compile them and linking them together
-        renderer.create_graphics_pipeline("/tmp/gl/shaders/single_vbo");
-    }
-     else
-    {        
-        renderer.create_graphics_pipeline("/tmp/gl/shaders/multiple_vbo");
-    }        
-    
-    // 3. Main loop
+    // 3. Create our graphics pipline
+    //    - At a minimumm, this means setting up the vertex and fragment shader
+    //   which means laoding the shaders, compile them and linking them together
+    renderer.create_graphics_pipeline(( layout ==  GeometryLayout::SingleVBO ? "/tmp/gl/shaders/single_vbo" :
+                                                                               "/tmp/gl/shaders/multiple_vbo" ) );
+
+    // 4. Main loop
     while (!_quit)
     {
         // input
@@ -75,6 +69,4 @@ void Application::run( GeometryLayout layout )
         window.render();
     }
 }
-
-
 
