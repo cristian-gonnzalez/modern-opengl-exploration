@@ -9,12 +9,21 @@
 #include <utility>
 
 
-// GW Windows manage the Window + GL context
+/** GW Window manages the Window + GL context
+ *
+ *      Creates window
+ *      Creates GL context
+ *      Initializes GLAD
+ *      Swaps buffers
+ */ 
 class GLWindow
 {
     public:
         GLWindow(int width=640, int height=480);
         ~GLWindow();
+
+        GLWindow(const GLWindow&) = delete;
+        GLWindow operator=(const GLWindow&) = delete;
 
         void render();
     
@@ -22,7 +31,7 @@ class GLWindow
         int height() const { return _height; }
 
     private:
-        SDL_Window*   _window{nullptr};
+        SDL_Window*   _window{nullptr};  // Rule of 3
         SDL_GLContext _gl_ctx{nullptr};
         int           _width{640}; 
         int           _height{480};

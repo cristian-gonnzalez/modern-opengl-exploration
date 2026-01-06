@@ -13,10 +13,10 @@ GLWindow::GLWindow(int width, int height)
 {
     // RAII
     // Creates an application window using OpenGL that supports SDL
-    _window = SDL_CreateWindow( "OpenGL Window",                // title
-                                    0, 0,                       // x, y, 
-                                    width, height,              
-                                    SDL_WINDOW_OPENGL );        // flags 
+    _window = SDL_CreateWindow( "OpenGL Window",       // title
+                                0, 0,                  // x, y, 
+                                width, height,              
+                                SDL_WINDOW_OPENGL );   // flags 
     if( _window == nullptr )
         throw gl_error("SDL window could not be created");
     

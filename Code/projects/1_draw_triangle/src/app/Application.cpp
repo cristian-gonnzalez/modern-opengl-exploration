@@ -1,6 +1,8 @@
 #include "Application.h"
 #include "GLWindow.h"
 #include "Renderer.h"
+#include "GeometryData.h"
+#include "GPUObject.h"
 
 #include <SDL2/SDL.h>         // SDL_init 
 
@@ -27,24 +29,25 @@ Application::~Application()
     SDL_Quit();
 }
 
-void Application::run( GeometryLayout layout ) 
+void Application::run( const GeometryData& geo_data ) 
 {
     // 1. Setup the grapichs program
     // Create and SDL window + GL context
     GLWindow window(640, 480);
 
     // Create renderer AFTER GL context exists
-    Renderer renderer;
+    Renderer renderer{};
+
+    renderer.add( geo_data );
 
     // 2. Creates the vertices in the CPU and then transfering 
     // thise ti the GPU using GL commands 
-    renderer.setup_geometry(layout);
+    renderer.setup_geometry();
 
     // 3. Create our graphics pipline
     //    - At a minimumm, this means setting up the vertex and fragment shader
     //   which means laoding the shaders, compile them and linking them together
-    renderer.create_graphics_pipeline(( layout ==  GeometryLayout::SingleVBO ? "/tmp/gl/shaders/single_vbo" :
-                                                                               "/tmp/gl/shaders/multiple_vbo" ) );
+    renderer.create_graphics_pipeline();
 
     // 4. Main loop
     while (!_quit)
