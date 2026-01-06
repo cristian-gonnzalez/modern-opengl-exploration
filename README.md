@@ -34,19 +34,63 @@ The goal of this project is purely **validation and environment setup**.
 
 ### `1_draw_triangle`
 
-A small exploratory project focused on understanding the basics of the OpenGL pipeline.
+An exploratory project focused on understanding the modern OpenGL rendering pipeline
+from CPU to GPU.
 
-- Uses **VAO** and **VBO** to upload geometry
-- Loads and compiles minimal vertex and fragment shaders
+Features
 
-Responsibilities are intentionally separated:
-
-- **Renderer**: OpenGL logic
-- **GLWindow**: SDL window creation and OpenGL context
-- **Application**: SDL initialization and application lifecycle
+- Uses VAO and VBO to upload geometry
+- Loads, compiles, and links vertex and fragment shaders
+- Demonstrates multiple vertex data layouts:
+  - Single VBO (position only)
+  - Interleaved VBO (position + color)
+  - Multiple VBOs (separate position and color buffers)
+- Renders:
+  - A triangle (default)
+  - A quad composed of two triangles
 
 This project is intentionally small and focused on learning how data flows from the
 CPU to the GPU.
+
+### Runtime options
+
+```bash
+./prog        # draw a triangle (default)
+./prog -q     # draw a quad (two triangles)
+```
+### Building
+```bash
+make vbo-single       # single VBO (positions only)
+make vbo-interleaved  # interleaved position + color
+make vbo-multiple     # multiple VBOs (separate buffers)
+
+```
+---
+
+### Architecture Overview
+
+Responsibilities are intentionally separated:
+
+- Application
+  - SDL initialization
+  - Application lifecycle and event loop
+
+- GLWindow
+  - SDL window creation
+  - OpenGL context management
+
+- Renderer
+  - OpenGL state setup
+  - Draw calls
+
+- GPUObject
+  - Owns VAO, VBO(s), and shader program
+  - Uploads geometry data to the GPU
+  - Encapsulates OpenGL resource lifetime (RAII)
+
+- GeometryData
+  - CPU-side vertex definitions (triangle / quad)
+  - Used to experiment with different VBO layouts
 
 ---
 
