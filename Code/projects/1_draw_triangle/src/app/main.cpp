@@ -27,8 +27,14 @@ int main(int argc, char** argv)
 
     try
     {
-        const GeometryData geo_data;
-
+        GeometryData geo_data = GeometryData::make_triangle();
+        if(argc > 1 )
+        {
+            std::string opt{argv[1]};
+            if (opt == "-q" )
+                geo_data = GeometryData::make_quad();
+        }
+        
         Application app;
         app.run(geo_data);
     }
