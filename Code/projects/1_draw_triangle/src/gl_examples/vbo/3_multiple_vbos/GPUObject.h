@@ -16,8 +16,9 @@ struct GPUObject
         ~GPUObject();
 
         void upload_to_gpu();
+
         // Note: we need to create the vertex and a fragment shaders after the GPU object (VAO+VBO) is store in the CPU
-        // since the shaders uses the VAO and VBO
+        // Shaders define how vertex attributes are interpreted during rendering. They must match the VAO attribute layout.
         void create_shader();
         void enable_shader();
 

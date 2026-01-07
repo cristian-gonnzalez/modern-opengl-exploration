@@ -16,18 +16,23 @@ VBO_HDR :=
 
 ifeq ($(VBO_OPTION), single)
 
-  VBO_SRC = src/geometry/1_singleVBO/*.cpp
-  VBO_HDR = src/geometry/1_singleVBO
+  VBO_SRC = src/gl_examples/vbo/1_single_vbo/*.cpp
+  VBO_HDR = src/gl_examples/vbo/1_single_vbo
 
 else ifeq ($(VBO_OPTION), interleave)
 
-  VBO_SRC = src/geometry/2_interleavedVBO/*.cpp
-  VBO_HDR = src/geometry/2_interleavedVBO
+  VBO_SRC = src/gl_examples/vbo/2_interleaved_vbo/*.cpp
+  VBO_HDR = src/gl_examples/vbo/2_interleaved_vbo
 
 else ifeq ($(VBO_OPTION), multiple)
 
-  VBO_SRC = src/geometry/3_MultipleVBOs/*.cpp
-  VBO_HDR = src/geometry/3_MultipleVBOs
+  VBO_SRC = src/gl_examples/vbo/3_multiple_vbos/*.cpp
+  VBO_HDR = src/gl_examples/vbo/3_multiple_vbos
+
+else ifeq ($(VBO_OPTION), ibo)
+
+  VBO_SRC = src/gl_examples/ibo/*.cpp
+  VBO_HDR = src/gl_examples/ibo
 
 endif
 
@@ -50,12 +55,13 @@ INCLUDES = -I. \
 .PHONY: help all clean
 
 help:
-	@echo "Usage: make vbo-[single|interleave|multiple]"
+	@echo "Usage: make vbo-[single|interleave|multiple|ibo]"
 	@echo
 	@echo "Targets:"
 	@echo " * vbo-single"
 	@echo " * vbo-interleave"
 	@echo " * vbo-multiple"
+	@echo " * vbo-ibo"
 
 vbo-%:
 	$(MAKE) VBO_OPTION=$* all

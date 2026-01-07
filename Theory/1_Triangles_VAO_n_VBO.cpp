@@ -40,7 +40,7 @@ Properties:
 */
 
 /*
-OpenGL objects:
+OpenGL objects: (see https://wikis.khronos.org/opengl/Vertex_Specification)
     We are going to use two OpenGL objects used for geometry:
 
             1. Vertex Buffer Object (VBO): data
