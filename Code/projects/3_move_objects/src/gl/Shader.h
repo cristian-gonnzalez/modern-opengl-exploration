@@ -7,7 +7,7 @@
 #include <iostream>
 
 #include <glad/glad.h> 
-
+#include <glm/ext/matrix_transform.hpp>
 
 // IMPORTANT:
 //   Only one shader object can be active at the time in OpenGL. This means that I could have one
@@ -35,6 +35,10 @@ class Shader
         {
             if (this != &other) 
             {
+                // remove the old shader program if we had one
+                if (_shader_program != 0)
+                    glDeleteProgram(_shader_program);
+
                 // Moves a resoruce in OpenGL is move the handle id, not copying GPU data
                 _shader_program = other._shader_program;
 
@@ -48,22 +52,30 @@ class Shader
 
         void create();
         void enable();
-        void update_uvar(const std::string u_var_name, float value)
+        void set_model_matrix( float y_offset )
         {
-            // glUniform* ALWAYS update the program that is active.
-            enable();
-
-            // Returns the location of a uniform variable
-            GLint location = glGetUniformLocation( _shader_program,
-                                                   u_var_name.c_str());
-            if( location < 0)
+            auto [success, location] = _get_uv_location("u_model_matrix");
+            if( success )
             {
-                std::cerr << "location " << u_var_name << " not found\n";
-                return;
-            }
-            
-            glUniform1f(location, value);  
+                                     //      unit matrix   
+                                     //       ^~~~~~~~~~~~~~   
+                glm::mat4 model = glm::translate( glm::mat4(1.0f), 
+                                                glm::vec3( 0.0f, y_offset, 0.0f) );             
+                glUniformMatrix4fv( location, 
+                                    1,
+                                    GL_FALSE,
+                                    &model[0][0]);
+            }     
         }
+
+        void update_uv(const std::string uv_name, float value)
+        {
+            auto [success, location] = _get_uv_location(uv_name);
+            if( success )
+                glUniform1f(location, value);  
+        }
+
+
 
     private:        
         // Stores the unique id for the grapichs pipeline program object that will be used for our OpenGL draw calls.
@@ -78,17 +90,21 @@ class Shader
         // ---- Shader helpers ----
         std::string read_file( std::string_view path ) const;
         GLuint      compile_shader( GLenum type, const std::string& source ) const;
-        GLuint      create_shader_program( const std::string& shaders_dir ) const;     
-        
-        GLint get_uniform_location( std::string u_var_name )
+        GLuint      create_shader_program( const std::string& shaders_dir ) const;             
+
+
+        std::pair<bool, GLint> _get_uv_location(const std::string uv_name)
         {
+            // glUniform* ALWAYS update the program that is active.
+            enable();
+
             // Returns the location of a uniform variable
             GLint location = glGetUniformLocation( _shader_program,
-                                                   u_var_name.c_str());
-            if( location < 0)
-                std::cerr << "location " << u_var_name << ": " << location << std::endl;
+                                                   uv_name.c_str());
+            bool success = ( location >= 0);
+            if(!success)
+                std::cerr << "location " << uv_name << " not found\n";
             
-            return location;
+            return {success, location};  
         }
-
 };

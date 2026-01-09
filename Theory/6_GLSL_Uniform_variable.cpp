@@ -106,3 +106,20 @@ Notes:
     - Forgetting glUseProgram leads to silent failure. -> "location 'u_offset' not found"
 
   */
+
+
+  /*
+  Code example:
+
+
+      Code/projects/3_move_objects$ make uv
+      make UV_OPTION=uv_only all
+      make[1]: Entering directory 'modern-opengl-exploration/Code/projects/3_move_objects'
+      mkdir -p /tmp/gl/shaders
+      cp -r src/shaders/uv/* /tmp/gl/shaders
+      g++ -g -DUV -std=c++20 -Weffc++ src/app/*.cpp src/gl/*.cpp src/gl/gl_objects/*.cpp ../../third_party/glad/src/glad.c  -Isrc/app/ -Isrc/gl/ -Isrc/gl/gl_objects/ -I../../third_party/glad/include -I../../third_party/glm-master/ -isystem ../../third_party/glm-master/ -o prog -lSDL2 -ldl
+      make[1]: Leaving directory 'modern-opengl-exploration/Code/projects/3_move_objects'
+
+      Code/projects/3_move_objects$ ./prog 
+  
+  */

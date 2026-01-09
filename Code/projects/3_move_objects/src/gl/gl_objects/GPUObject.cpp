@@ -16,16 +16,8 @@ GPUObject::GPUObject(const GeometryData& cpu_data)
 
 GPUObject::~GPUObject()
 {
-    
     // RAII
-    if (_ibo)
-        glDeleteBuffers(1, &_ibo);
-
-    if (_vbo)
-        glDeleteBuffers(1, &_vbo);
-
-    if (_vao)
-        glDeleteVertexArrays(1, &_vao);
+    reset_gpu_handles();
 }
 
 void GPUObject::upload_to_gpu()
@@ -81,6 +73,7 @@ void GPUObject::upload_to_gpu()
 void GPUObject::create_shader()
 {
     _shader.create();
+    apply_transform();
 }
 
 void GPUObject::enable_shader()

@@ -35,14 +35,33 @@ INCLUDES = -Isrc/app/ \
 		-isystem $(GLM_HDR)
 
 # --------------------------------
+# Options
+# --------------------------------
+
+UV_OPTION ?= uv_mat4
+DEFINES :=
+
+ifeq ($(UV_OPTION), uv_only)
+	DEFINES += -DUV
+	SHADER_SRC := src/shaders/uv/*
+else
+	SHADER_SRC := src/shaders/uv_mat4/*
+endif
+
+# --------------------------------
 # Targets
 # --------------------------------
 .PHONY: all clean
 
-all:
-	mkdir -p /tmp/gl/shaders
-	cp -r ./src/shaders/* /tmp/gl/shaders/
-	g++ -g -std=c++20 -Weffc++ $(SRC) $(INCLUDES) -o prog -lSDL2 -ldl
 
+all: shaders
+	g++ -g $(DEFINES) -std=c++20 -Weffc++ $(SRC) $(INCLUDES) -o prog -lSDL2 -ldl
+
+shaders:
+	mkdir -p /tmp/gl/shaders
+	cp -r $(SHADER_SRC) /tmp/gl/shaders
+
+uv:
+	$(MAKE) UV_OPTION=uv_only all
 clean:
 	rm -f prog

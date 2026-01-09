@@ -39,6 +39,9 @@ struct GPUObject
         {
             if (this != &other) 
             {
+                  // reset old the cpu resources handles
+                  reset_gpu_handles();
+
                   // Moves a resoruce in OpenGL is move the handle id, not copying GPU data
                   _cpu_data = std::move(other._cpu_data);
                   _vao = other._vao;
@@ -65,7 +68,7 @@ struct GPUObject
         void move_up( float offset )
         {
             _y += offset;
-            _shader.update_uvar("u_offset", _y);
+            apply_transform();
             
             //std::cout << "_y: " << _y << std::endl;
         }
@@ -74,7 +77,7 @@ struct GPUObject
         void move_down( float offset )
         {
             _y -= offset;
-            _shader.update_uvar("u_offset", _y);
+            apply_transform();
             
             //std::cout << "_y: " << _y << std::endl;
         }
@@ -109,4 +112,28 @@ struct GPUObject
         //   This made the '_shader' variable defined here as part of one GPU object, a design decision and not 
         // a RULE of OpenGL.
         Shader _shader;
+
+        void reset_gpu_handles()
+        {
+            if (_ibo)
+                glDeleteBuffers(1, &_ibo);
+
+            if (_vbo)
+                glDeleteBuffers(1, &_vbo);
+
+            if (_vao)
+                glDeleteVertexArrays(1, &_vao);
+    
+            _vao = _vbo = _ibo = 0;
+        }
+
+        void apply_transform()
+        {
+        #ifdef UV
+            _shader.update_uv("u_offset", _y);
+        #else
+            _shader.set_model_matrix(_y);
+        #endif
+        }
+
   };
