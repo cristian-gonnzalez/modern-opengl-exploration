@@ -2,6 +2,10 @@
 
 #include <iostream>
 #include <stdexcept>
+
+#include "Mesh.h"
+#include "Shader.h"
+
  
 class renderer_error : public std::runtime_error
 {
@@ -11,48 +15,8 @@ class renderer_error : public std::runtime_error
         {}
 };
 
-void Renderer::add( std::shared_ptr<GPUObject> data )
-{
-    _gpu_objs.push_back(data);
-}
 
 
-// Step 1: Geometry specification (CPU → GPU)
-// 
-// Goal:
-// - Upload vertex data to GPU memory
-// - Describe how that data should be interpreted
-// 
-// Pipeline stage:
-// - Vertex Specification (before vertex shader)
-void Renderer::setup_geometry()
-{
-    for(auto& e: _gpu_objs)
-        e->upload_to_gpu();
-
-    // IMPORTANT:
-    // - Attribute enable state is stored in the VAO
-    // - Do NOT disable it here
-    // Unbind our currently bound VAO
-    glBindVertexArray(0);
-}
-
-
-
-// Step 2: Shader pipeline creation
-// 
-// Goal:
-// - Compile vertex + fragment shaders
-// - Link them into a usable GPU program
-// 
-// Pipeline stages:
-// - Vertex Shader
-// - Fragment Shader
-void Renderer::create_graphics_pipeline()
-{
-    for(auto& e: _gpu_objs)
-        e->create_shader();
-}
 
 // Step 3: Frame preparation
 // 
@@ -111,17 +75,24 @@ void Renderer::pre_draw(int width, int height)
  *      - Bind geometry description
  *      - Tell GPU how many vertices to render
  */
-void Renderer::draw()
-{
-    for (auto& obj : _gpu_objs)
+void Renderer::draw(const std::vector< std::shared_ptr<Renderable> >& objects) 
+{    
+    Shader* current = nullptr;
+    for (const auto& r : objects) 
     {
-        obj->enable_shader();
-        obj->draw();
+        if( &r->material->shader() != current) 
+        {
+            current = &r->material->shader();
+            current->use();
+        }
+
+#ifdef UV
+        r->material->bind( r->transform.position.y );
+#else
+        r->material->bind( r->transform.get_model_matrix() );
+#endif
+        r->mesh->draw();
     }
-    
-    // Stop using our current graphics pipeline
-    // Note: this is not necessary if we only have one graphics pipline.
+
     glUseProgram(0);
 }
-
-

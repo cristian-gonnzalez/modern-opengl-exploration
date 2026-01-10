@@ -4,6 +4,14 @@
 
 #include <glad/glad.h>    
 
+
+/** GeometryData
+ *
+ * CPU-side vertex and index data container.
+ * Used to construct Mesh objects.
+ *
+ * Has no GPU or rendering logic.
+ */
 struct GeometryData
 {    
     static GeometryData make_triangle()

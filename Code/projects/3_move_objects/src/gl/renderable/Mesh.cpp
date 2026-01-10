@@ -1,9 +1,8 @@
-#include "GPUObject.h"
+#include "Mesh.h"
 
 
-
-GPUObject::GPUObject(const GeometryData& cpu_data)
-: _cpu_data{cpu_data}, _shader{"/tmp/gl/shaders"}
+Mesh::Mesh(const GeometryData& cpu_data)
+: _cpu_data{cpu_data}
 {    
     // RAII
     glGenVertexArrays(1, &_vao);
@@ -14,13 +13,57 @@ GPUObject::GPUObject(const GeometryData& cpu_data)
 }
 
 
-GPUObject::~GPUObject()
+Mesh::~Mesh()
 {
     // RAII
     reset_gpu_handles();
 }
 
-void GPUObject::upload_to_gpu()
+
+Mesh::Mesh(Mesh&& other) noexcept
+: _cpu_data(std::move(other._cpu_data)),
+  _vao(other._vao),
+  _vbo(other._vbo),
+  _ibo(other._ibo)
+{
+    other._vao = other._vbo = other._ibo = 0;
+}
+
+Mesh& Mesh::operator=(Mesh&& other) noexcept
+{
+    if (this != &other) 
+    {
+            // reset old the cpu resources handles
+            reset_gpu_handles();
+
+            // Moves a resoruce in OpenGL is move the handle id, not copying GPU data
+            _cpu_data = std::move(other._cpu_data);
+            _vao = other._vao;
+            _vbo = other._vbo;
+            _ibo = other._ibo;
+
+            // Leaves the other object in valid state
+            other._vao = other._vbo = other._ibo = 0;
+    }
+    return *this;
+}
+
+void Mesh::reset_gpu_handles()
+{
+    if (_ibo)
+        glDeleteBuffers(1, &_ibo);
+
+    if (_vbo)
+        glDeleteBuffers(1, &_vbo);
+
+    if (_vao)
+        glDeleteVertexArrays(1, &_vao);
+
+    _vao = _vbo = _ibo = 0;
+}
+
+
+void Mesh::upload_to_gpu()
 {
     // Selects the vao we just create
     glBindVertexArray( _vao );
@@ -68,20 +111,16 @@ void GPUObject::upload_to_gpu()
     // Colors       
     glEnableVertexAttribArray(1);
     glVertexAttribPointer(1, _cpu_data._color_size, GL_FLOAT, GL_FALSE, stride, (GLvoid*)( _cpu_data._position_size * sizeof(GLfloat) ) );
+
+
+    // IMPORTANT:
+    // - Attribute enable state is stored in the VAO
+    // - Do NOT disable it here
+    // Unbind our currently bound VAO
+    glBindVertexArray(0);
 }
 
-void GPUObject::create_shader()
-{
-    _shader.create();
-    apply_transform();
-}
-
-void GPUObject::enable_shader()
-{
-    _shader.enable();
-}
-
-void GPUObject::draw() const
+void Mesh::draw() const
 {
     // Enable our attributes
     glBindVertexArray(_vao);

@@ -24,12 +24,52 @@ Shader::~Shader()
         glDeleteProgram(_shader_program);
 }
 
+
+Shader::Shader(Shader&& other) noexcept
+: _shader_program(other._shader_program),
+  _shaders_dir(std::move(other._shaders_dir))
+{
+    other._shader_program = 0;
+}
+
+Shader& Shader::operator=(Shader&& other) noexcept
+{
+    if (this != &other) 
+    {
+        // remove the old shader program if we had one
+        if (_shader_program != 0)
+            glDeleteProgram(_shader_program);
+
+        // Moves a resoruce in OpenGL is move the handle id, not copying GPU data
+        _shader_program = other._shader_program;
+
+        // Leave the other object in valid state
+        other._shader_program = 0;
+    }
+    return *this;
+}
+
+std::pair<bool, GLint> Shader::get_uv_location(const std::string name)
+{
+    // glUniform* ALWAYS update the program that is active.
+    use();
+
+    // Returns the location of a uniform variable
+    GLint location = glGetUniformLocation( _shader_program,
+                                            name.c_str());
+    bool success = ( location >= 0);
+    if(!success)
+        std::cerr << "location " << name << " not found\n";
+    
+    return {success, location};  
+}
+
 void Shader::create()
 {
     _shader_program = create_shader_program(_shaders_dir);
 }
 
-void Shader::enable()
+void Shader::use()
 {       
     // Selects the active shader program.
     glUseProgram(_shader_program);      

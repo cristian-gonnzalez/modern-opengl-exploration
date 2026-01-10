@@ -4,6 +4,16 @@
 #include "Application.h"
 
 /*
+
+Objects defined in OpenGL:
+
+    Mesh        → geometry only (VAO/VBO)
+    Shader      → compiled GPU program
+    Material    → shader + uniforms
+    Renderable  → mesh + material + transform
+    Renderer    → owns OpenGL state & draw order
+
+
     Application
     ├─ SDL (init, quit, events)
     └─ owns GLWindow

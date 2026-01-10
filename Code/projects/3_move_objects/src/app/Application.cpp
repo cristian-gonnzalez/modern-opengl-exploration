@@ -1,8 +1,10 @@
 #include "Application.h"
 #include "GLWindow.h"
 #include "Renderer.h"
+#include "Material.h"
 #include "GeometryData.h"
-#include "GPUObject.h"
+#include "Mesh.h"
+#include "Renderable.h"
 
 #include <SDL2/SDL.h>         // SDL_init 
 
@@ -39,19 +41,25 @@ void Application::run( const GeometryData& geo_data )
     // Create renderer AFTER GL context exists
     Renderer renderer{};
 
-    std::shared_ptr<GPUObject> sp_gpuobj{ std::make_shared<GPUObject>(geo_data) };
-
-    renderer.add( sp_gpuobj );
-
     // 2. Creates the vertices in the CPU and then transfering 
-    // thise ti the GPU using GL commands 
-    renderer.setup_geometry();
-
+    // these ti the GPU using GL commands 
+    Mesh shape(geo_data);
+    shape.upload_to_gpu();
+    
     // 3. Create our graphics pipline
     //    - At a minimumm, this means setting up the vertex and fragment shader
     //   which means laoding the shaders, compile them and linking them together
-    renderer.create_graphics_pipeline();
+    auto shader = std::make_shared<Shader>("/tmp/gl/shaders");
+    shader->create();
+    
+    Material material(shader);
 
+    std::shared_ptr<Renderable> rend_object{std::make_shared<Renderable>()};
+
+    rend_object->material = &material;
+    rend_object->mesh = &shape;
+
+    std::vector< std::shared_ptr<Renderable> > _renderables { rend_object };
     // 4. Main loop
     while (!_quit)
     {
@@ -69,19 +77,19 @@ void Application::run( const GeometryData& geo_data )
         // Retrive keyboard state
         const Uint8 *state = SDL_GetKeyboardState(NULL);
         if( state[SDL_SCANCODE_UP])
-        {
-            sp_gpuobj->move_up( 0.01f );
+        {    
+            rend_object->transform.position.y += 0.01f;
         }
         if( state[SDL_SCANCODE_DOWN])
         {   
-            sp_gpuobj->move_down( 0.01f );
+            rend_object->transform.position.y -= 0.01f;
         }
         
 
         // Setup anything (i.e. OpenGL state) that needs to take place before draw calls
         renderer.pre_draw(window.width(), window.height());
         // Draw calls in OpenGL
-        renderer.draw();
+        renderer.draw(_renderables);
 
         // Update screen of our specified windows
         window.render();

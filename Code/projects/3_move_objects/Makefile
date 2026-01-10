@@ -20,7 +20,8 @@ GLM_HDR = ../../third_party/glm-master/
 # --------------------------------
 SRC = src/app/*.cpp \
       src/gl/*.cpp  \
-      src/gl/gl_objects/*.cpp  \
+      src/gl/renderable/*.cpp  \
+      src/gl/material/*.cpp  \
       $(OPENGL_SRC) \
       $(VBO_SRC)
 
@@ -29,7 +30,8 @@ SRC = src/app/*.cpp \
 
 INCLUDES = -Isrc/app/ \
            -Isrc/gl/ \
-           -Isrc/gl/gl_objects/ \
+           -Isrc/gl/renderable/ \
+           -Isrc/gl/material/ \
            -I$(OPENGL_HDR) \
            -I$(GLM_HDR) \
 		-isystem $(GLM_HDR)
