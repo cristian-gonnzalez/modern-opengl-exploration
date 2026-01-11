@@ -19,6 +19,8 @@ struct Application
     private:
         // If this is 'true' then the application terminates
         bool            _quit{false}; 
+
+        void read_input(Transform& transform);
 };
 
 

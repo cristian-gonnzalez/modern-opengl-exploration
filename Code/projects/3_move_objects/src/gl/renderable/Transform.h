@@ -22,13 +22,15 @@ struct Transform
 
         // Set our model matrix by applyitng a translation (moving the object)
         model = glm::translate( model, position );  
-        
         // Update our model matrix by applying a rotation after a translation   
         model = glm::rotate( model, 
-                             glm::radians(rotation.y),             // angle
-                             glm::vec3(0.0f, 1.0f, 0.0f)  );  // the axis we want to rotate around      
+                             glm::radians(rotation.y),       // angle
+                             glm::vec3(0.0f, 1.0f, 0.0f) );  // the axis we want to rotate around     
                                     // ^~~~  ^~~~  ^~~~
                                     //   x     y     z
+        model = glm::rotate( model, glm::radians(rotation.x), glm::vec3(1.0f, 0.0f, 0.0f) );       
+        model = glm::rotate( model, glm::radians(rotation.z), glm::vec3(0.0f, 0.0f, 1.0f) );    
+                                   
         model = glm::scale( model, scale );      
         return model;
     }

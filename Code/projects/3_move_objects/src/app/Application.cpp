@@ -76,53 +76,68 @@ void Application::run( const GeometryData& geo_data )
     while (!_quit)
     {
         // input
-        SDL_Event e;
-        while (SDL_PollEvent(&e))
-        {
-            if (e.type == SDL_QUIT)
-            {
-                std::cout << "Goodbye\n";
-                _quit = true;
-            }
-        }
+        read_input(rend_obj->transform);
 
-        // Retrive keyboard state
-        const Uint8 *state = SDL_GetKeyboardState(NULL);
-
-        // Camera perspective: zoom in/out
-        if( state[SDL_SCANCODE_UP])
-            rend_obj->transform.position.z += 0.01f;
-        if( state[SDL_SCANCODE_DOWN])
-            rend_obj->transform.position.z -= 0.01f;
-        
-        // Transformations:
-        // Movement
-        if( state[SDL_SCANCODE_W])
-            rend_obj->transform.position.y += 0.01f;
-        if( state[SDL_SCANCODE_S])
-            rend_obj->transform.position.y -= 0.01f;
-        if( state[SDL_SCANCODE_D])
-            rend_obj->transform.position.x += 0.01f;
-        if( state[SDL_SCANCODE_A])
-            rend_obj->transform.position.x -= 0.01f;
-        // Rotation
-        if( state[SDL_SCANCODE_LEFT])
-            rend_obj->transform.rotation.y -= 1.0f;
-        if( state[SDL_SCANCODE_RIGHT])
-            rend_obj->transform.rotation.y += 1.0f;
-        // Scale
-        if( state[SDL_SCANCODE_Q])
-            rend_obj->transform.scale += 0.01f;
-        if( state[SDL_SCANCODE_E])
-            rend_obj->transform.scale -= 0.01f;
-  
         // Setup anything (i.e. OpenGL state) that needs to take place before draw calls
-        renderer.pre_draw(window.width(), window.height());
+        renderer.pre_draw(renderables, camera, window.width(), window.height());
         // Draw calls in OpenGL
-        renderer.draw(renderables, camera);
+        renderer.draw(renderables);
 
         // Update screen of our specified windows
         window.render();
     }
 }
 
+
+void Application::read_input(Transform& transform)
+{
+    SDL_Event e;
+    while (SDL_PollEvent(&e))
+    {
+        if (e.type == SDL_QUIT)
+        {
+            std::cout << "Goodbye\n";
+            _quit = true;
+        }
+    }
+
+    // Retrive keyboard state
+    const Uint8 *state = SDL_GetKeyboardState(NULL);
+
+    // Camera perspective: zoom in/out
+    if( state[SDL_SCANCODE_UP])
+        transform.position.z += 0.01f;
+    if( state[SDL_SCANCODE_DOWN])
+        transform.position.z -= 0.01f;
+    
+    // Transformations:
+    // Movement
+    if( state[SDL_SCANCODE_W])
+        transform.position.y += 0.01f;
+    if( state[SDL_SCANCODE_S])
+        transform.position.y -= 0.01f;
+    if( state[SDL_SCANCODE_D])
+        transform.position.x += 0.01f;
+    if( state[SDL_SCANCODE_A])
+        transform.position.x -= 0.01f;
+    // Rotation
+    if( state[SDL_SCANCODE_LEFT])
+        transform.rotation.y -= 1.0f;
+    if( state[SDL_SCANCODE_RIGHT])
+        transform.rotation.y += 1.0f;
+    if( state[SDL_SCANCODE_Z])
+        transform.rotation.x -= 1.0f;
+    if( state[SDL_SCANCODE_X])
+        transform.rotation.x += 1.0f;
+    if( state[SDL_SCANCODE_C])
+        transform.rotation.z -= 1.0f;
+    if( state[SDL_SCANCODE_V])
+        transform.rotation.z += 1.0f;
+    // Scale
+    if( state[SDL_SCANCODE_Q])
+        transform.scale += 0.01f;
+    if( state[SDL_SCANCODE_E])
+        transform.scale -= 0.01f;
+
+
+}
