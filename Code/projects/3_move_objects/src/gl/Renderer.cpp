@@ -75,7 +75,7 @@ void Renderer::pre_draw(int width, int height)
  *      - Bind geometry description
  *      - Tell GPU how many vertices to render
  */
-void Renderer::draw(const std::vector< std::shared_ptr<Renderable> >& objects) 
+void Renderer::draw(const std::vector< std::shared_ptr<Renderable> >& objects, const Camera& camera) 
 {    
     Shader* current = nullptr;
     for (const auto& r : objects) 
@@ -89,8 +89,10 @@ void Renderer::draw(const std::vector< std::shared_ptr<Renderable> >& objects)
 #ifdef UV
         r->material->bind( r->transform.position.y );
 #else
-        r->material->bind( r->transform.get_model_matrix() );
+        r->material->set_transform( r->transform.get_model_matrix() );
 #endif
+
+        r->material->set_projection( camera.get_projection_matrix() ); 
         r->mesh->draw();
     }
 

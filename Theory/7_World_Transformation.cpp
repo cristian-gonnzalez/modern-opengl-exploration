@@ -1,7 +1,7 @@
 /** World transformation
  */
 /*
-- model transform matrix:
+- Model transform matrix:
 
    We are going to use sth know as a 'model transform matrix' that takes the shape and then transform them so that we can rotate
  scale, translate by moving the object.

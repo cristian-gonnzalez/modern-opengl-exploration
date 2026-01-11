@@ -8,6 +8,7 @@
 
 
 #include "Renderable.h"
+#include "Camera.h"
 
 /** Renderer
  *
@@ -22,5 +23,5 @@ class Renderer
         // Step 3: Prepare frame (state + clearing)
         void pre_draw(int width, int height);
         // Step 4: Issue draw call
-        void draw(const std::vector< std::shared_ptr<Renderable> >& objects);
+        void draw(const std::vector< std::shared_ptr<Renderable> >& objects, const Camera& camera);
 };

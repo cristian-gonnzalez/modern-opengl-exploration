@@ -1,6 +1,7 @@
 #pragma once
 
 #include <glm/ext/matrix_transform.hpp>
+#include <glm/ext/matrix_clip_space.hpp>
 
 /** Transform
  *
@@ -11,6 +12,8 @@
  */
 struct Transform 
 {    
+    // This is our model transdormation by translating
+    // our object into world space
     glm::mat4 get_model_matrix() const 
     {
         //      unit matrix   

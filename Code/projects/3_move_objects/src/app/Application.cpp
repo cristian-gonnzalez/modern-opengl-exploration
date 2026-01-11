@@ -4,6 +4,7 @@
 #include "Material.h"
 #include "GeometryData.h"
 #include "Mesh.h"
+#include "Camera.h"
 #include "Renderable.h"
 
 #include <SDL2/SDL.h>         // SDL_init 
@@ -59,7 +60,22 @@ void Application::run( const GeometryData& geo_data )
     rend_object->material = &material;
     rend_object->mesh = &shape;
 
-    std::vector< std::shared_ptr<Renderable> > _renderables { rend_object };
+
+    std::vector< std::shared_ptr<Renderable> > renderables { rend_object };
+
+    // In OpenGL itself: there is no camera.
+    // OpenGL only knows about:
+    // 
+    // - Buffers
+    // - Vertex arrays
+    // - Shaders
+    // - Uniforms
+    // - Draw calls
+    // 
+    // A “camera” is just a set of uniform values
+    // Camera     → produces view/projection data
+    Camera camera{640, 480};
+    
     // 4. Main loop
     while (!_quit)
     {
@@ -76,20 +92,27 @@ void Application::run( const GeometryData& geo_data )
 
         // Retrive keyboard state
         const Uint8 *state = SDL_GetKeyboardState(NULL);
-        if( state[SDL_SCANCODE_UP])
-        {    
-            rend_object->transform.position.y += 0.01f;
-        }
-        if( state[SDL_SCANCODE_DOWN])
-        {   
-            rend_object->transform.position.y -= 0.01f;
-        }
-        
 
+        // Camera perspective: zoom in/out
+        if( state[SDL_SCANCODE_UP])
+            rend_object->transform.position.z += 0.01f;
+        if( state[SDL_SCANCODE_DOWN])
+            rend_object->transform.position.z -= 0.01f;
+        
+        // Movement
+        if( state[SDL_SCANCODE_W])
+            rend_object->transform.position.y += 0.01f;
+        if( state[SDL_SCANCODE_S])
+            rend_object->transform.position.y -= 0.01f;
+        if( state[SDL_SCANCODE_D])
+            rend_object->transform.position.x += 0.01f;
+        if( state[SDL_SCANCODE_A])
+            rend_object->transform.position.x -= 0.01f;
+        
         // Setup anything (i.e. OpenGL state) that needs to take place before draw calls
         renderer.pre_draw(window.width(), window.height());
         // Draw calls in OpenGL
-        renderer.draw(_renderables);
+        renderer.draw(renderables, camera);
 
         // Update screen of our specified windows
         window.render();

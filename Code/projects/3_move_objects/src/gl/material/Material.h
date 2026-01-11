@@ -18,10 +18,16 @@ class Material
         {
         }
 
-        void bind(const glm::mat4& model) 
+        void set_transform(const glm::mat4& model) 
         {
             _shader->use();
             _uniforms.set_mat4("u_model_matrix", model);
+        }
+
+        void set_projection(const glm::mat4& perpective) 
+        {
+            _shader->use();
+            _uniforms.set_mat4("u_projection_matrix", perpective);
         }
 
         void bind(const float y_offset) 
