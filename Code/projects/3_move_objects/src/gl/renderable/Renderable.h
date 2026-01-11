@@ -12,6 +12,11 @@
  */
 struct Renderable 
 {
+    Renderable(Mesh* mesh_ptr, Material* mat_ptr)
+    : mesh{mesh_ptr}, material{mat_ptr}
+    {
+    }
+
     Mesh*       mesh{nullptr};
     Material*   material{nullptr};
     Transform   transform{};

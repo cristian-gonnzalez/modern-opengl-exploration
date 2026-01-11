@@ -55,13 +55,9 @@ void Application::run( const GeometryData& geo_data )
     
     Material material(shader);
 
-    std::shared_ptr<Renderable> rend_object{std::make_shared<Renderable>()};
+    auto rend_obj{ std::make_shared<Renderable>(&shape, &material) };
 
-    rend_object->material = &material;
-    rend_object->mesh = &shape;
-
-
-    std::vector< std::shared_ptr<Renderable> > renderables { rend_object };
+    std::vector< std::shared_ptr<Renderable> > renderables{ rend_obj };
 
     // In OpenGL itself: there is no camera.
     // OpenGL only knows about:
@@ -74,7 +70,7 @@ void Application::run( const GeometryData& geo_data )
     // 
     // A “camera” is just a set of uniform values
     // Camera     → produces view/projection data
-    Camera camera{640, 480};
+    Camera camera{window.width(), window.height()};
     
     // 4. Main loop
     while (!_quit)
@@ -95,20 +91,27 @@ void Application::run( const GeometryData& geo_data )
 
         // Camera perspective: zoom in/out
         if( state[SDL_SCANCODE_UP])
-            rend_object->transform.position.z += 0.01f;
+            rend_obj->transform.position.z += 0.01f;
         if( state[SDL_SCANCODE_DOWN])
-            rend_object->transform.position.z -= 0.01f;
+            rend_obj->transform.position.z -= 0.01f;
         
+        // Transformations:
         // Movement
         if( state[SDL_SCANCODE_W])
-            rend_object->transform.position.y += 0.01f;
+            rend_obj->transform.position.y += 0.01f;
         if( state[SDL_SCANCODE_S])
-            rend_object->transform.position.y -= 0.01f;
+            rend_obj->transform.position.y -= 0.01f;
         if( state[SDL_SCANCODE_D])
-            rend_object->transform.position.x += 0.01f;
+            rend_obj->transform.position.x += 0.01f;
         if( state[SDL_SCANCODE_A])
-            rend_object->transform.position.x -= 0.01f;
+            rend_obj->transform.position.x -= 0.01f;
+        // Rotation
+        if( state[SDL_SCANCODE_LEFT])
+            rend_obj->transform.rotation.y -= 1.0f;
+        if( state[SDL_SCANCODE_RIGHT])
+            rend_obj->transform.rotation.y += 1.0f;
         
+
         // Setup anything (i.e. OpenGL state) that needs to take place before draw calls
         renderer.pre_draw(window.width(), window.height());
         // Draw calls in OpenGL

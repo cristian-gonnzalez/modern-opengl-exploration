@@ -14,7 +14,15 @@ void main()
 {
     v_vertex_color = color;
 
+    // For each vertex
     vec4 new_position = u_projection_matrix * u_model_matrix * vec4( position, 1.0f );
+    //                  ^~~~~~~~~~~~~~~~~~~   ^~~~~~~~~~~~~~   ^~~~~~~~~~~~~~~~~~~~~   
+    //                            ^                 ^                  ^
+    //                            |                 |               positions
+    //                            |             transform    <-
+    //                       projection    <-
+    //                                                     <-----  Reading backwards
+
     //gl_Position = vec4(new_position.x, new_position.y, new_position.z, 1.0f);
     //                                                                   ^~~~
     //                                                      Dont forget w when using perpective matrix
