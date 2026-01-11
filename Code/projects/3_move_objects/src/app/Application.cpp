@@ -121,9 +121,9 @@ void Application::read_input(Transform& transform)
     if( state[SDL_SCANCODE_A])
         transform.position.x -= 0.01f;
     // Rotation
-    if( state[SDL_SCANCODE_LEFT])
+    if( state[SDL_SCANCODE_Q])
         transform.rotation.y -= 1.0f;
-    if( state[SDL_SCANCODE_RIGHT])
+    if( state[SDL_SCANCODE_E])
         transform.rotation.y += 1.0f;
     if( state[SDL_SCANCODE_Z])
         transform.rotation.x -= 1.0f;
@@ -134,9 +134,9 @@ void Application::read_input(Transform& transform)
     if( state[SDL_SCANCODE_V])
         transform.rotation.z += 1.0f;
     // Scale
-    if( state[SDL_SCANCODE_Q])
+    if( state[SDL_SCANCODE_RIGHTBRACKET])
         transform.scale += 0.01f;
-    if( state[SDL_SCANCODE_E])
+    if( state[SDL_SCANCODE_SLASH])
         transform.scale -= 0.01f;
 
 

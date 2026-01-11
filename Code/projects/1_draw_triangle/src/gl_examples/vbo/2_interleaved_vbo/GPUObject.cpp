@@ -92,9 +92,9 @@ void GPUObject::enable_shader()
 void GPUObject::draw() const
 {
     // Enable our attributes
+    // NOTE:
+    //  The GL_ARRAY_BUFFER (VBO) binding is stored in the VAO That’s why you do not need to rebind _vbo in draw().
     glBindVertexArray(_vao);
-    // Select the vertex buffer object we want to enable
-    glBindBuffer(GL_ARRAY_BUFFER, _vbo);
 
     // Render data
     glDrawArrays(GL_TRIANGLES, 0, _cpu_data._num_vertex); 

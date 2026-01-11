@@ -68,6 +68,8 @@ void Renderer::pre_draw(const std::vector< std::shared_ptr<Renderable> >& object
             current->use();
         }
 
+        // We are passing uniforms to the shaders
+        // This is a way to communicate with shaders
 #ifdef UV
         r->material->bind( r->transform.position.y );
 #else

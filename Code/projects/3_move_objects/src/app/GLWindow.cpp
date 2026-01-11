@@ -16,7 +16,7 @@ GLWindow::GLWindow(int width, int height)
     _window = SDL_CreateWindow( "OpenGL Window",       // title
                                 0, 0,                  // x, y, 
                                 width, height,              
-                                SDL_WINDOW_OPENGL );   // flags 
+                                SDL_WINDOW_OPENGL | SDL_WINDOW_SHOWN );   // flags 
     if( _window == nullptr )
         throw gl_error("SDL window could not be created");
     
@@ -69,7 +69,8 @@ void GLWindow::_create_gl_contex()
     SDL_GL_SetSwapInterval(1);
 
     // Initializes the Glad library
-    // This library brings all the OpenGL functions 
+    // This library brings all the OpenGL functions
+    // NOTE: Loads ALWAYS GLAD after OpenGL context is created. Error could occurs if not follow the order
     if( !gladLoadGLLoader(SDL_GL_GetProcAddress) )
         throw std::runtime_error("Failed to initialize GLAD");
 
