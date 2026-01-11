@@ -20,6 +20,12 @@ struct Transform
         //       ^~~~~~~~~~~~~~   
         glm::mat4 model(1.0f);
 
+        // NOTE: 
+        //   Transformation order matters
+        //
+        //         [translate -> rotate -> scale]   !=   [rotate -> translate -> scale]
+        //
+
         // Set our model matrix by applyitng a translation (moving the object)
         model = glm::translate( model, position );  
         // Update our model matrix by applying a rotation after a translation   
