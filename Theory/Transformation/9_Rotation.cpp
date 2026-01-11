@@ -24,7 +24,7 @@ them through different coordinate spaces.
          ^  ^  ^  ^
          x  y  z  w
     
-  - Each **column** represents a basis axis (X, Y, Z)
+  - Each **column** represents a basis axis (X, Y, Z) and the way we are transformation each of them
   - The last column represents translation
   - The bottom row enables homogeneous coordinates
 

@@ -110,8 +110,12 @@ void Application::run( const GeometryData& geo_data )
             rend_obj->transform.rotation.y -= 1.0f;
         if( state[SDL_SCANCODE_RIGHT])
             rend_obj->transform.rotation.y += 1.0f;
-        
-
+        // Scale
+        if( state[SDL_SCANCODE_Q])
+            rend_obj->transform.scale += 0.01f;
+        if( state[SDL_SCANCODE_E])
+            rend_obj->transform.scale -= 0.01f;
+  
         // Setup anything (i.e. OpenGL state) that needs to take place before draw calls
         renderer.pre_draw(window.width(), window.height());
         // Draw calls in OpenGL

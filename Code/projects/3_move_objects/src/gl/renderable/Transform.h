@@ -27,11 +27,13 @@ struct Transform
         model = glm::rotate( model, 
                              glm::radians(rotation.y),             // angle
                              glm::vec3(0.0f, 1.0f, 0.0f)  );  // the axis we want to rotate around      
-                                    // ^~~~        ^~~~        ^~~~
-                                    //   x          y           z
+                                    // ^~~~  ^~~~  ^~~~
+                                    //   x     y     z
+        model = glm::scale( model, scale );      
         return model;
     }
 
     glm::vec3 rotation{0};
-    glm::vec3 position{0};
+    glm::vec3 position{0,0,-2};
+    glm::vec3 scale{1};
 };
