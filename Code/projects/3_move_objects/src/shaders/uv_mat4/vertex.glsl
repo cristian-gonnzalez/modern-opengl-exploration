@@ -8,6 +8,8 @@ out vec3 v_vertex_color;
 // uniform variables
 uniform mat4 u_model_matrix;      // This is our model transdormation by translating
                                   // our object into world space (uses position)
+                                  
+uniform mat4 u_view_matrix; // We are using perpective projection
 uniform mat4 u_projection_matrix; // We are using perpective projection
 
 void main()
@@ -15,11 +17,12 @@ void main()
     v_vertex_color = color;
 
     // For each vertex
-    vec4 new_position = u_projection_matrix * u_model_matrix * vec4( position, 1.0f );
-    //                  ^~~~~~~~~~~~~~~~~~~   ^~~~~~~~~~~~~~   ^~~~~~~~~~~~~~~~~~~~~   
-    //                            ^                 ^                  ^
-    //                            |                 |               positions
-    //                            |             transform    <-
+    vec4 new_position = u_projection_matrix * u_view_matrix * u_model_matrix * vec4( position, 1.0f );
+    //                  ^~~~~~~~~~~~~~~~~~~   ^~~~~~~~~~~~~~  ^~~~~~~~~~~~~~   ^~~~~~~~~~~~~~~~~~~~~   
+    //                            ^                ^               ^                  ^
+    //                            |                                |               positions
+    //                            |                             transform    <-
+    //                            |               view       <-  (Model)
     //                       projection    <-
     //                                                     <-----  Reading backwards
 

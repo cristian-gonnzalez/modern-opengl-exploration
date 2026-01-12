@@ -30,7 +30,7 @@ class renderer_error : public std::runtime_error
  * 
  * @return void
  */
-void Renderer::pre_draw(const std::vector< std::shared_ptr<Renderable> >& objects, const Camera& camera, int width, int height)
+void Renderer::pre_draw(const std::vector< std::shared_ptr<Renderable> >& objects, const Camera& camera)
 {
     //   Depth testing determines which fragment is visible when multiple fragments map to the same pixel.
     //
@@ -38,13 +38,13 @@ void Renderer::pre_draw(const std::vector< std::shared_ptr<Renderable> >& object
     // Only the fragment that passes the test is drawn
     //
     //   As we are drawing a single 2D triangle, there is No overlapping geometry so no need for depth testing
-    glDisable(GL_DEPTH_TEST);
-    glDisable(GL_CULL_FACE);
+    glDisable( GL_DEPTH_TEST );
+    glDisable( GL_CULL_FACE );
 
     // The viewport maps Normalized Device Coordinates (NDC) to window pixels.
-    glViewport(0, 0,  // Bottom-left corner: (0, 0)
-               width, 
-               height);
+    glViewport( 0, 0,  // Bottom-left corner: (0, 0)
+                camera.get_width(), 
+                camera.get_height() );
 
     // Defines the color used when clearing the color buffer.
     //           r  , g,   b,   a  
@@ -75,6 +75,7 @@ void Renderer::pre_draw(const std::vector< std::shared_ptr<Renderable> >& object
 #else
         r->material->set_transform( r->transform.get_model_matrix() );
 #endif
+        r->material->set_view( camera.get_view_matrix() ); 
         r->material->set_projection( camera.get_projection_matrix() ); 
     }
 }

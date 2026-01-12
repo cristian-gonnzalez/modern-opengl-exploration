@@ -35,10 +35,17 @@ struct Transform
                                     // ^~~~  ^~~~  ^~~~
                                     //   x     y     z
         model = glm::rotate( model, glm::radians(rotation.x), glm::vec3(1.0f, 0.0f, 0.0f) );       
-        model = glm::rotate( model, glm::radians(rotation.z), glm::vec3(0.0f, 0.0f, 1.0f) );    
-                                   
-        model = glm::scale( model, scale );      
+        model = glm::rotate( model, glm::radians(rotation.z), glm::vec3(0.0f, 0.0f, 1.0f) );                                       
+        model = glm::scale( model, scale );
+        
         return model;
+    }
+
+    void reset()
+    {
+        rotation = glm::vec3(0.0f, 0.0f, 0.0f);
+        scale = glm::vec3(1.0f, 1.0f, 1.0f);
+        position =  glm::vec3(0.0f, 0.0f, -2.0f);
     }
 
     glm::vec3 rotation{0};

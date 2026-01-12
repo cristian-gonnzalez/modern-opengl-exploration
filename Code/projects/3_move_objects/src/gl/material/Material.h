@@ -24,6 +24,12 @@ class Material
             _uniforms.set_mat4("u_model_matrix", model);
         }
 
+        void set_view(const glm::mat4& view) 
+        {
+            _shader->use();
+            _uniforms.set_mat4("u_view_matrix", view);
+        }
+        
         void set_projection(const glm::mat4& perpective) 
         {
             _shader->use();

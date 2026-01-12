@@ -39,6 +39,8 @@ void Application::run( const GeometryData& geo_data )
     // Create and SDL window + GL context
     GLWindow window(640, 480);
 
+    mouse_setup(window);
+
     // Create renderer AFTER GL context exists
     Renderer renderer{};
 
@@ -69,17 +71,19 @@ void Application::run( const GeometryData& geo_data )
     // - Draw calls
     // 
     // A “camera” is just a set of uniform values
-    // Camera     → produces view/projection data
+    // Camera     → produces view/projection matrix and we upload as uniforms to be used in shaders
+    //
+    // NOTE: in a real game, we might have multiple cameras (Strategy desing pattern) where you can change the view
     Camera camera{window.width(), window.height()};
     
     // 4. Main loop
     while (!_quit)
     {
         // input
-        read_input(rend_obj->transform);
+        read_input(rend_obj->transform, camera);
 
         // Setup anything (i.e. OpenGL state) that needs to take place before draw calls
-        renderer.pre_draw(renderables, camera, window.width(), window.height());
+        renderer.pre_draw(renderables, camera);
         // Draw calls in OpenGL
         renderer.draw(renderables);
 
@@ -89,55 +93,65 @@ void Application::run( const GeometryData& geo_data )
 }
 
 
-void Application::read_input(Transform& transform)
-{
+void Application::read_input(Transform& transform, Camera& camera)
+{   
     SDL_Event e;
     while (SDL_PollEvent(&e))
     {
-        if (e.type == SDL_QUIT)
+        if ( e.type == SDL_QUIT )
         {
             std::cout << "Goodbye\n";
             _quit = true;
+        }
+        if(e.type == SDL_MOUSEMOTION)
+        {
+            camera.mouse_look( e.motion.xrel, e.motion.yrel );
         }
     }
 
     // Retrive keyboard state
     const Uint8 *state = SDL_GetKeyboardState(NULL);
 
+    if( state[SDL_SCANCODE_ESCAPE])
+    {
+        std::cout << "Goodbye\n";
+        _quit = true;
+    }
+    
+    // Camera
+    if( state[SDL_SCANCODE_UP])    camera.move_forward(0.01f);
+    if( state[SDL_SCANCODE_DOWN])  camera.move_backward(0.01f);
+    if( state[SDL_SCANCODE_LEFT])  camera.move_left(0.01f);
+    if( state[SDL_SCANCODE_RIGHT]) camera.move_right(0.01f);
+
+    /*   
     // Camera perspective: zoom in/out
     if( state[SDL_SCANCODE_UP])
         transform.position.z += 0.01f;
+        //                 ^~
+        //   TODO: Fix me, Im moving the object, not the camera
     if( state[SDL_SCANCODE_DOWN])
         transform.position.z -= 0.01f;
-    
+        //                 ^~
+        //   TODO: Fix me, Im moving the object, not the camera
+   */ 
     // Transformations:
     // Movement
-    if( state[SDL_SCANCODE_W])
-        transform.position.y += 0.01f;
-    if( state[SDL_SCANCODE_S])
-        transform.position.y -= 0.01f;
-    if( state[SDL_SCANCODE_D])
-        transform.position.x += 0.01f;
-    if( state[SDL_SCANCODE_A])
-        transform.position.x -= 0.01f;
+    if( state[SDL_SCANCODE_W]) transform.position.y += 0.01f;
+    if( state[SDL_SCANCODE_S]) transform.position.y -= 0.01f;
+    if( state[SDL_SCANCODE_D]) transform.position.x += 0.01f;
+    if( state[SDL_SCANCODE_A]) transform.position.x -= 0.01f;
     // Rotation
-    if( state[SDL_SCANCODE_Q])
-        transform.rotation.y -= 1.0f;
-    if( state[SDL_SCANCODE_E])
-        transform.rotation.y += 1.0f;
-    if( state[SDL_SCANCODE_Z])
-        transform.rotation.x -= 1.0f;
-    if( state[SDL_SCANCODE_X])
-        transform.rotation.x += 1.0f;
-    if( state[SDL_SCANCODE_C])
-        transform.rotation.z -= 1.0f;
-    if( state[SDL_SCANCODE_V])
-        transform.rotation.z += 1.0f;
+    if( state[SDL_SCANCODE_Q]) transform.rotation.y -= 1.0f;
+    if( state[SDL_SCANCODE_E]) transform.rotation.y += 1.0f;
+    if( state[SDL_SCANCODE_Z]) transform.rotation.x -= 1.0f;
+    if( state[SDL_SCANCODE_X]) transform.rotation.x += 1.0f;
+    if( state[SDL_SCANCODE_C]) transform.rotation.z -= 1.0f;
+    if( state[SDL_SCANCODE_V]) transform.rotation.z += 1.0f;
     // Scale
-    if( state[SDL_SCANCODE_RIGHTBRACKET])
-        transform.scale += 0.01f;
-    if( state[SDL_SCANCODE_SLASH])
-        transform.scale -= 0.01f;
+    if( state[SDL_SCANCODE_RIGHTBRACKET]) transform.scale += 0.01f;
+    if( state[SDL_SCANCODE_SLASH])        transform.scale -= 0.01f;
 
+    if( state[SDL_SCANCODE_R]) transform.reset();
 
 }

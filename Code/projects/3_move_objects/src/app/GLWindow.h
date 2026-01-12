@@ -24,11 +24,19 @@ class GLWindow
 
         GLWindow(const GLWindow&) = delete;
         GLWindow operator=(const GLWindow&) = delete;
+        
+        GLWindow(const GLWindow&&) = delete;
+        GLWindow operator=(GLWindow&&) = delete;
 
         void render();
     
         int width() const { return _width; }
         int height() const { return _height; }
+
+         SDL_Window* get_window()
+         {
+            return _window;
+         }
 
     private:
         SDL_Window*   _window{nullptr};  // Rule of 3

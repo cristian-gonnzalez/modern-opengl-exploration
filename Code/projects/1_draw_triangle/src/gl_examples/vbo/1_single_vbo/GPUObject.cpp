@@ -72,6 +72,9 @@ void GPUObject::upload_to_gpu()
     // Store vertices into a VBO
     glBufferData(GL_ARRAY_BUFFER,                              // GLenum target : kind of buffer
                  _cpu_data.vertices.size() * sizeof(GLfloat),  // size: Specifies the size in bytes of the buffer object's new data store
+                                //                  ^~~~~~~
+                                //           GL_FLOAT != GLfloat
+                                //        GLenum type    GLsizei              
                  _cpu_data.vertices.data(),
                  GL_STATIC_DRAW );                             // GLenum usage:  Specifies the expected usage pattern of the data store. 
       //         ^~~~~~~~~~~~~~~                               //   The symbolic constant must be 

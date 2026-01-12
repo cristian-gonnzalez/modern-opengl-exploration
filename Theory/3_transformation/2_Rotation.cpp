@@ -1,3 +1,6 @@
+/** Transformation: Rotation
+ */
+ /*
 
 Transfomrmation: https://open.gl/transformations
   
@@ -70,3 +73,51 @@ Summary
 - Model matrix transforms them into **world space**
 - Transformations use homogeneous coordinates (vec4)
 - Rotation matrices define how axes are rotated around a given axis
+
+
+Example of rotation:
+
+                                                                  World space
+           Local space                                               Y
+        (local coordinates)                                          ^
+                                                                     |
+                y                                                    ^ y         ┐  Local coordinates
+                ^                                                    |           |  The shape has its own local axes
+                |                                                *---|---*       |  which are transformed into world space
+            *---|---*                                            |   |   |       |
+            |   |   |               =======>                     *---|---*       | 
+            *---|---*               translate                --------+-------->  |   
+        --------+--------> x                                        /|        x  ┘
+               /                                                   / |
+             /                                                    z  +-----------------------> X
+             z                                                      /
+                                                                   /
+                                                                  /
+                                                                 Z
+
+
+Rotation:
+            World space
+              Y
+              ^
+              |
+              ^ y'         ┐
+              |/ |         |  When we apply a rotation around the Y axis,
+              /  *         |  the object's *local axes* rotate,
+             /| /          |  but the *world axes remain fixed*.
+            *  /           |
+            | /+-------->  |
+            * /        z'  ┘
+             /|
+          -x' +-----------------------> X
+             /
+            /
+           /
+          Z
+
+
+IMPORTANT:
+  When we apply a rotation, the object’s local coordinate system rotates,
+  but the world coordinate system does NOT rotate.
+
+*/
