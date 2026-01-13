@@ -1,96 +1,114 @@
 # Modern OpenGL Exploration
 
-This project exists purely out of **personal interest**.
+This project exists purely out of **personal interest**. I wanted to better understand how C++ can take advantage of the GPU.
 
-I wanted to better understand how C++ can take advantage of the GPU, beyond using
-higher-level libraries such as SDL.
+I am not a graphics expert, and this is **not intended to be a game engine**. Most famous 3D games are implemented with C++, 
+and I’ve always been curious about the theory behind this. This repository contains experiments around those concepts.
 
-I am not a graphics expert, and this is **not intended to be a game engine or
-production-ready graphics code**. The goal is to understand the fundamentals behind:
-
-- How modern C++ applications interact with the GPU
-- How OpenGL works at a low level
-- How responsibilities can be cleanly structured in native code
-
-C++ is widely used to build high-performance 2D and 3D applications, and I’ve always
-been curious about what actually happens under the hood. This repository is a
-hands-on exploration of those ideas.
-
+- CPU ↔ GPU interaction
+- Modern OpenGL concepts (VAO, VBO, shaders)
+- Graphics-oriented architecture in C++
+- Mathematical foundations for 3D rendering
+  
 ---
 
 ## Code
 
 ### `0_gl_setup`
 
-A minimal setup project used to verify that OpenGL is correctly initialized.
+Minimal OpenGL validation project.
 
-- Creates an SDL window with an OpenGL context
-- Uses **glad** to load OpenGL functions
-- Queries and prints GPU and OpenGL information directly
+- SDL window and OpenGL context creation
+- Function loading via **glad**
+- GPU and OpenGL capability queries
 
-The goal of this project is purely **validation and environment setup**.
+Purpose: environment verification and baseline setup.
 
 ---
 
 ### `1_draw_triangle`
 
-An exploratory project focused on understanding the modern OpenGL rendering pipeline
-from CPU to GPU.
+Exploration of the modern OpenGL rendering pipeline.
 
-Features
-
-- Uses VAO and VBO to upload geometry
-- Loads, compiles, and links vertex and fragment shaders
-- Demonstrates multiple vertex data layouts:
-  - Single VBO (position only)
+- VAO and VBO management
+- Shader compilation and linking
+- Multiple vertex data layouts:
+  - Single VBO (positions only)
   - Interleaved VBO (position + color)
-  - Multiple VBOs (separate position and color buffers)
-- Renders:
-  - A triangle (default)
-  - A quad composed of two triangles
+  - Multiple VBOs (separate buffers)
+- Rendering:
+  - Triangle
+  - Quad (two triangles)
 
-This project is intentionally small and focused on learning how data flows from the
-CPU to the GPU.
-
-### Runtime options
-
+#### Options
 ```bash
-./prog        # draw a triangle (default)
-./prog -q     # draw a quad (two triangles)
+./prog        # triangle (default)
+./prog -q     # quad
 ```
+
 ### Building
 ```bash
 make vbo-single       # single VBO (positions only)
 make vbo-interleaved  # interleaved position + color
 make vbo-multiple     # multiple VBOs (separate buffers)
-
 ```
 ---
 
 ### Architecture Overview
 
-Responsibilities are intentionally separated:
+- Application - SDL initialization and application lifecycle and event loop
+- GLWindow - SDL window creation and OpenGL context management
+- Renderer - OpenGL state setup and draw calls
+- GPUObject - Owns VAO, VBO(s), shader program and uploads geometry data to the GPU
+- GeometryData - CPU-side vertex definitions (triangle / quad) (Used to experiment with different VBO layouts)
 
-- Application
-  - SDL initialization
-  - Application lifecycle and event loop
+### NOTE: 
+The classes and responsibilities do not follow common OpenGL design conventions.
+I chose to focus on Buffer Objects rather than established abstractions.
+Names such as GPUObject are intended to make buffer ownership and usage explicit.
 
-- GLWindow
-  - SDL window creation
-  - OpenGL context management
+In 3_move_objects, more conventional OpenGL responsibilities are used
+(e.g. Mesh, Material, Renderable, etc.).
 
-- Renderer
-  - OpenGL state setup
-  - Draw calls
+---
+### `2_glm_notes`
 
-- GPUObject
-  - Owns VAO, VBO(s), and shader program
-  - Uploads geometry data to the GPU
-  - Encapsulates OpenGL resource lifetime (RAII)
+Isolated experiments focused on GLM and graphics-related mathematics.
+No rendering code.
 
-- GeometryData
-  - CPU-side vertex definitions (triangle / quad)
-  - Used to experiment with different VBO layouts
+- Vector operations:
+  - Unit vectors
+  - Dot product
+  - Cross product
+- Matrix operations:
+  - Scaling
+  - Rotation
+  - Translation
+  - Chained transformations
+
+---
+
+### `3_move_objects`
+
+  Extends rendering toward transforming and positioning objects in 3D space.
+
+- Key areas:
+    - Model / View / Projection (MVP) pipeline
+    - Camera abstraction
+    - Object transforms
+    - Shader uniform management
+
+#### Architecture highlights:
+
+- Camera – view and projection matrices
+- Transform – position, rotation, scale
+- Mesh – geometry and GPU buffer ownership
+- Material / Shader – shader programs and uniform handling
+- Renderer – draw orchestration and OpenGL state control
+
+This project demonstrates scene-level object manipulation rather than fixed geometry.
+
+![Example](screenshots/move_example.gif)
 
 ---
 
