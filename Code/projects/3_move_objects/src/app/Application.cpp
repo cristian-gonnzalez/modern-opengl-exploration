@@ -62,8 +62,8 @@ void Application::run()
 
     auto r1{ std::make_shared<Renderable>(&m1, &material) };
     auto r2{ std::make_shared<Renderable>(&m2, &material) };
-    r1->transform.position.x = 0;
-    r2->transform.position.x = -2;
+    r1->transform.position.x = 1;
+    r2->transform.position.x = -1;
 
     std::vector< std::shared_ptr<Renderable> > renderables{ r1,  r2};
 
@@ -151,13 +151,15 @@ void Application::read_input(Transform& transform, Camera& camera)
     if( state[SDL_SCANCODE_S]) transform.position.y -= 0.01f;
     if( state[SDL_SCANCODE_D]) transform.position.x += 0.01f;
     if( state[SDL_SCANCODE_A]) transform.position.x -= 0.01f;
+    if( state[SDL_SCANCODE_1]) transform.position.z += 0.01f;
+    if( state[SDL_SCANCODE_2]) transform.position.z -= 0.01f;
     // Rotation
     if( state[SDL_SCANCODE_Q]) transform.rotation.y -= 1.0f;
     if( state[SDL_SCANCODE_E]) transform.rotation.y += 1.0f;
-    if( state[SDL_SCANCODE_Z]) transform.rotation.x -= 1.0f;
-    if( state[SDL_SCANCODE_X]) transform.rotation.x += 1.0f;
-    if( state[SDL_SCANCODE_C]) transform.rotation.z -= 1.0f;
-    if( state[SDL_SCANCODE_V]) transform.rotation.z += 1.0f;
+    if( state[SDL_SCANCODE_3]) transform.rotation.x -= 1.0f;
+    if( state[SDL_SCANCODE_4]) transform.rotation.x += 1.0f;
+    if( state[SDL_SCANCODE_5]) transform.rotation.z -= 1.0f;
+    if( state[SDL_SCANCODE_6]) transform.rotation.z += 1.0f;
     // Scale
     if( state[SDL_SCANCODE_RIGHTBRACKET]) transform.scale += 0.01f;
     if( state[SDL_SCANCODE_SLASH])        transform.scale -= 0.01f;

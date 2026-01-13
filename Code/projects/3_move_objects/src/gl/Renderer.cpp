@@ -16,8 +16,6 @@ class renderer_error : public std::runtime_error
 };
 
 
-
-
 // Step 3: Frame preparation
 // 
 // Goal:
@@ -26,7 +24,7 @@ class renderer_error : public std::runtime_error
 // - Activate shader program
 /**
  * Pre-Draw typically we will use this for setting some sort of 'state'
- * Note: some of the calls may take place at different stages (post-processing) of the pipline
+ * Note: some of the calls may take place at different stages (post-processing) of the pipeline
  * 
  * @return void
  */
