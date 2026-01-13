@@ -4,7 +4,6 @@
 #include "Application.h"
 
 /*
-
 Objects defined in OpenGL:
 
     Mesh        → geometry only (VAO/VBO)
@@ -12,24 +11,6 @@ Objects defined in OpenGL:
     Material    → shader + uniforms
     Renderable  → mesh + material + transform
     Renderer    → owns OpenGL state & draw order
-
-
-    Application
-    ├─ SDL (init, quit, events)
-    └─ owns GLWindow
-
-    GLWindow (platform + context)
-    ├─ SDL_Window*
-    ├─ SDL_GLContext
-    └─ creates graphics context
-
-    Renderer (pure OpenGL)
-    ├─ draw calls
-    └─ NO SDL includes
-
-    GPUObject (pure OpenGL) 
-    ├─ shaders
-    └─ VAOs / VBOs
 */
 
 int main(int argc, char** argv)
@@ -37,16 +18,8 @@ int main(int argc, char** argv)
 
     try
     {
-        GeometryData geo_data = GeometryData::make_triangle();
-        if(argc > 1 )
-        {
-            std::string opt{argv[1]};
-            if (opt == "-q" )
-                geo_data = GeometryData::make_quad();
-        }
-        
         Application app;
-        app.run(geo_data);
+        app.run();
     }
     catch( const std::exception& e )
     {

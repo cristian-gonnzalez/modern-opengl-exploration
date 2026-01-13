@@ -6,7 +6,8 @@
 /** Transform
  *
  * Stores local spatial data (position, rotation, scale).
- * Produces a model matrix for rendering.
+ * Produces a model matrix for rendering. This not produce the action.
+ * Then we will to share the matrix using uniforms to the shaders
  *
  * Pure CPU-side math, no OpenGL dependencies.
  */
@@ -45,10 +46,10 @@ struct Transform
     {
         rotation = glm::vec3(0.0f, 0.0f, 0.0f);
         scale = glm::vec3(1.0f, 1.0f, 1.0f);
-        position =  glm::vec3(0.0f, 0.0f, -2.0f);
+        position =  glm::vec3(0.0f, 0.0f, -5.0f);
     }
 
     glm::vec3 rotation{0};
-    glm::vec3 position{0,0,-2};
+    glm::vec3 position{0,0,-5};
     glm::vec3 scale{1};
 };

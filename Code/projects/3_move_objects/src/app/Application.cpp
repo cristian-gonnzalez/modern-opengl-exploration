@@ -33,7 +33,7 @@ Application::~Application()
     SDL_Quit();
 }
 
-void Application::run( const GeometryData& geo_data ) 
+void Application::run() 
 {
     // 1. Setup the grapichs program
     // Create and SDL window + GL context
@@ -46,8 +46,11 @@ void Application::run( const GeometryData& geo_data )
 
     // 2. Creates the vertices in the CPU and then transfering 
     // these ti the GPU using GL commands 
-    Mesh shape(geo_data);
-    shape.upload_to_gpu();
+    Mesh m1(GeometryData::make_triangle());
+    Mesh m2(GeometryData::make_quad());
+    
+    m1.upload_to_gpu();
+    m2.upload_to_gpu();
     
     // 3. Create our graphics pipline
     //    - At a minimumm, this means setting up the vertex and fragment shader
@@ -57,9 +60,12 @@ void Application::run( const GeometryData& geo_data )
     
     Material material(shader);
 
-    auto rend_obj{ std::make_shared<Renderable>(&shape, &material) };
+    auto r1{ std::make_shared<Renderable>(&m1, &material) };
+    auto r2{ std::make_shared<Renderable>(&m2, &material) };
+    r1->transform.position.x = 0;
+    r2->transform.position.x = -2;
 
-    std::vector< std::shared_ptr<Renderable> > renderables{ rend_obj };
+    std::vector< std::shared_ptr<Renderable> > renderables{ r1,  r2};
 
     // In OpenGL itself: there is no camera.
     // OpenGL only knows about:
@@ -79,11 +85,15 @@ void Application::run( const GeometryData& geo_data )
     // 4. Main loop
     while (!_quit)
     {
+        // Always rotate r2
+        r2->transform.rotation.y += 0.1f;
+ 
         // input
-        read_input(rend_obj->transform, camera);
+        read_input(r1->transform, camera);
 
         // Setup anything (i.e. OpenGL state) that needs to take place before draw calls
-        renderer.pre_draw(renderables, camera);
+        // Usually, setup the background and uploads uniforms used for all the renderables
+        renderer.pre_draw(material, camera);
         // Draw calls in OpenGL
         renderer.draw(renderables);
 

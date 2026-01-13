@@ -11,7 +11,7 @@ Camera::Camera(int width, int height)
     // Asume we are placed at the origin
     // NOTE: If you are modeling a game, the eye position might be a little bit elevated since 
     // your characteer has height 
-    _eye = glm::vec3(0.0f);
+    _eye = glm::vec3(0.0f,0.0f,0.0f);
  // ^~~~
  // eye is a Point (not a vector)
  //

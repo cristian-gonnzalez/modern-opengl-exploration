@@ -73,8 +73,8 @@ void Mesh::upload_to_gpu()
 
     // Upload data to GPU
     glBufferData(GL_ARRAY_BUFFER,                       
-                 _cpu_data._vertices.size() * sizeof(GLfloat),
-                 _cpu_data._vertices.data(),
+                 _cpu_data.vertices_size() * sizeof(Vertex),
+                 _cpu_data.vertices().data(),
                  GL_STATIC_DRAW );                       
 
     // Index Buffer Object uploading
@@ -85,8 +85,8 @@ void Mesh::upload_to_gpu()
     //              Vertex array indices      
     // Upload and populate the vertex indices array to GPU
     glBufferData(GL_ELEMENT_ARRAY_BUFFER,                       
-                 _cpu_data._vertex_indices.size() * sizeof(GLuint),
-                 _cpu_data._vertex_indices.data(),
+                 _cpu_data.indices_size() * sizeof(GLuint),
+                 _cpu_data.indices().data(),
                  GL_STATIC_DRAW );                       
 
 
@@ -103,14 +103,14 @@ void Mesh::upload_to_gpu()
     //          └───────────────────────────────────┘
     
     // Positions:
-    GLsizei stride = 6 * sizeof(GLfloat);
+    GLsizei stride = sizeof(Vertex);
 
     glEnableVertexAttribArray(0);
-    glVertexAttribPointer(0, _cpu_data._position_size, GL_FLOAT, GL_FALSE, stride, (GLvoid*) 0 );
+    glVertexAttribPointer(0, _cpu_data.position_size(), GL_FLOAT, GL_FALSE, stride, (GLvoid*) 0 );
     
     // Colors       
     glEnableVertexAttribArray(1);
-    glVertexAttribPointer(1, _cpu_data._color_size, GL_FLOAT, GL_FALSE, stride, (GLvoid*)( _cpu_data._position_size * sizeof(GLfloat) ) );
+    glVertexAttribPointer(1, _cpu_data.color_size(), GL_FLOAT, GL_FALSE, stride, (GLvoid*)( _cpu_data.position_size() * sizeof(GLfloat) ) );
 
 
     // IMPORTANT:
@@ -131,7 +131,7 @@ void Mesh::draw() const
     // Render data
     // We need to tell to use the vertex array indices when drawing 
     glDrawElements(GL_TRIANGLES, 
-                   _cpu_data._vertex_indices.size(),  // count  : The number of elements to be rendered.
+                   _cpu_data.indices().size(),  // count  : The number of elements to be rendered.
                    GL_UNSIGNED_INT,                   // type   : Specifies the type of the values in indices. 
                                                       //          Must be one of GL_UNSIGNED_BYTE, GL_UNSIGNED_SHORT, or GL_UNSIGNED_INT.
                    (const GLvoid *)0);                // indices: Specifies an offset of the first index in the array in the 

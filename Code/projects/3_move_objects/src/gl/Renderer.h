@@ -21,7 +21,7 @@ class Renderer
 {
     public:
         // Step 3: Prepare frame (state + clearing)
-        void pre_draw(const std::vector< std::shared_ptr<Renderable> >& objects, const Camera& camera);
+        void pre_draw( Material& mat, const Camera& camera);
         // Step 4: Issue draw call
         void draw(const std::vector< std::shared_ptr<Renderable> >& objects);
 };
