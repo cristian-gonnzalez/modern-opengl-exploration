@@ -9,7 +9,9 @@ and I’ve always been curious about the theory behind this. This repository con
 - Modern OpenGL concepts (VAO, VBO, shaders)
 - Graphics-oriented architecture in C++
 - Mathematical foundations for 3D rendering
-  
+
+---
+![Example -- 3_move_objects](screenshots/move_example.gif)
 ---
 
 ## Code
@@ -107,8 +109,6 @@ No rendering code.
 - Renderer – draw orchestration and OpenGL state control
 
 This project demonstrates scene-level object manipulation rather than fixed geometry.
-
-![Example](screenshots/move_example.gif)
 
 ---
 
